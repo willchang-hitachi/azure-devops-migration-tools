@@ -21,15 +21,36 @@ The tool processes string fields through a series of regex-based manipulators th
 
 ### How It Works
 
-The String Manipulator Tool operates on all string fields within work items during migration:
+The String Manipulator Tool operates on all text fields within work items during migration:
 
-1. **Field Processing**: The tool identifies all string-type fields in each work item
+1. **Field Processing**: The tool identifies all text-bearing fields in each work item
 2. **Sequential Application**: Each configured manipulator is applied in the order defined in the configuration
 3. **Regex Transformations**: Pattern-based replacements using regular expressions
 4. **Length Enforcement**: Truncates fields that exceed the maximum allowed length
 5. **Conditional Execution**: Each manipulator can be individually enabled or disabled
 
 The tool is automatically invoked by migration processors and applies transformations before work items are saved to the target system.
+
+### Which Fields Are Processed
+
+The tool runs against every field whose type carries text, which means:
+
+| Field type  | Examples                                             |
+| ----------- | ---------------------------------------------------- |
+| `String`    | `System.Title`, most custom single-line text fields   |
+| `PlainText` | Multi-line text fields that hold no markup            |
+| `Html`      | `System.Description`, `Microsoft.VSTS.*` rich text    |
+| `History`   | `System.History` (the comments on each revision)      |
+
+Non-text fields (dates, integers, identities, tree paths, booleans) are copied
+across untouched.
+
+Because `System.Description` and `System.History` hold rich text, their content
+is HTML (or Markdown, where the project stores rich text that way). Patterns
+written for single-line values may behave differently there, so test any
+manipulator against a sample of real descriptions and comments before running a
+full migration — a pattern such as `<[^>]*>` will strip the markup out of those
+fields, which may or may not be what you want.
 
 ### Use Cases
 

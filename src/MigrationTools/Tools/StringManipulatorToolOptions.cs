@@ -7,7 +7,7 @@ using MigrationTools.Tools.Infrastructure;
 namespace MigrationTools.Tools
 {
     /// <summary>
-    /// Configuration options for the StringManipulatorTool, defining string transformations and length limits for work item string fields.
+    /// Configuration options for the StringManipulatorTool, defining string transformations and length limits for work item text fields.
     /// </summary>
     public class StringManipulatorToolOptions : ToolOptions
     {
@@ -19,7 +19,7 @@ namespace MigrationTools.Tools
         public int MaxStringLength { get; set; }
 
         /// <summary>
-        /// List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
+        /// List of regex based string manipulations to apply to all text fields, including rich text fields such as `System.Description` and `System.History`. Each regex replacement is applied in order and can be enabled or disabled.
         /// </summary>
         /// <default>{}</default>
         public List<RegexStringManipulator> Manipulators { get; set; }

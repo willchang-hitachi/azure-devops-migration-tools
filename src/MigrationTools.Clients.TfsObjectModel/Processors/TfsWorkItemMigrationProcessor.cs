@@ -512,8 +512,15 @@ namespace MigrationTools.Processors
 
                     switch (f.FieldDefinition.FieldType)
                     {
+                        // Text bearing fields all go through the string manipulators. A rich text
+                        // field keeps FieldType.Html even when the project stores its content as
+                        // Markdown, and System.History is FieldType.History, so both are included
+                        // alongside the plain text types.
                         case FieldType.String:
-                            string oldValue = oldWorkItem.Fields[f.ReferenceName].Value.ToString();
+                        case FieldType.PlainText:
+                        case FieldType.Html:
+                        case FieldType.History:
+                            string oldValue = oldWorkItem.Fields[f.ReferenceName].Value?.ToString();
                             string newValue = CommonTools.StringManipulator.ProcessString(oldValue);
                             newWorkItem.Fields[f.ReferenceName].Value = newValue;
                             break;
@@ -558,9 +565,9 @@ namespace MigrationTools.Processors
                     NumberStyles.Any))
                 newWorkItem.Fields["Microsoft.VSTS.Common.BacklogPriority"].Value = 10;
 
-            var description = new StringBuilder();
-            description.Append(oldWorkItem.Description);
-            newWorkItem.Description = description.ToString();
+            // Runs after the field loop above, so it has to apply the same manipulators or it would
+            // put the unprocessed System.Description back.
+            newWorkItem.Description = CommonTools.StringManipulator.ProcessString(oldWorkItem.Description) ?? string.Empty;
             fieldMappingTimer.Stop();
         }
 
@@ -856,7 +863,9 @@ namespace MigrationTools.Processors
                     // Impersonate revision author. Mapping will apply later and may change this.
                     targetWorkItem.ToWorkItem().Fields["System.ChangedDate"].Value = revision.ChangedDate;
                     targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = revision.Fields["System.ChangedBy"].Value.ToString();
-                    targetWorkItem.ToWorkItem().Fields["System.History"].Value = revision.Fields["System.History"].Value;
+                    // Set after PopulateWorkItem, so the manipulators have to be applied here too or
+                    // the unprocessed System.History would be written back.
+                    targetWorkItem.ToWorkItem().Fields["System.History"].Value = CommonTools.StringManipulator.ProcessString(revision.Fields["System.History"].Value?.ToString());
 
                     // Todo: Ensure all field maps use WorkItemData.Fields to apply a correct mapping
                     CommonTools.FieldMappingTool.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);

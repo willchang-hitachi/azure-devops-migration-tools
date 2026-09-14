@@ -9,7 +9,7 @@ using MigrationTools.Tools.Interfaces;
 namespace MigrationTools.Tools
 {
     /// <summary>
-    /// Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
+    /// Used to process the text fields of a work item. This covers plain text fields as well as the rich text and history fields such as `System.Description` and `System.History`. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
     /// </summary>
     public class StringManipulatorTool : Tool<StringManipulatorToolOptions>, IStringManipulatorTool
     {

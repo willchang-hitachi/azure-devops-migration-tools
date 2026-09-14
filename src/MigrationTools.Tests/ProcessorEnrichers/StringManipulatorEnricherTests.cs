@@ -244,6 +244,55 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(expected, newValue);
         }
 
+        /// <summary>
+        /// System.Description and System.History hold rich text, so the default manipulator has to
+        /// clean the content without destroying the surrounding markup.
+        /// </summary>
+        [TestMethod(), TestCategory("L1")]
+        [DataRow("<div>Hello</div>", "<div>Hello</div>")]                                  // Html markup preserved
+        [DataRow("<div>Hello World</div>", "<div>Hello World</div>")]                // Control chars removed from inside markup
+        [DataRow("<p>Ship it 😀</p>", "<p>Ship it </p>")]                        // Emoji stripped from inside markup
+        [DataRow("<a href=\"http://x/y\">café</a>", "<a href=\"http://x/y\">café</a>")]    // Attributes and Unicode preserved
+        [DataRow("## Heading\n\n- item", "## Heading\n\n- item")]                          // Markdown rich text preserved
+        public void StringManipulatorTool_DefaultManipulator_RichTextFields(string value, string expected)
+        {
+            var options = new StringManipulatorToolOptions();
+            options.Enabled = true;
+            options.MaxStringLength = 1000;
+            // No manipulators set - should use default
+            var x = GetStringManipulatorTool(options);
+
+            string? newValue = x.ProcessString(value);
+            Assert.AreEqual(expected, newValue);
+        }
+
+        /// <summary>
+        /// A configured manipulator has to apply to rich text content the same way it applies to
+        /// single line string fields.
+        /// </summary>
+        [TestMethod(), TestCategory("L1")]
+        public void StringManipulatorTool_CustomManipulator_AppliesToRichText()
+        {
+            var options = new StringManipulatorToolOptions();
+            options.Enabled = true;
+            options.MaxStringLength = 1000;
+            options.Manipulators = new List<RegexStringManipulator>
+            {
+                new RegexStringManipulator
+                {
+                    Enabled = true,
+                    Description = "Repoint embedded links at the target collection",
+                    Pattern = "http://oldserver/",
+                    Replacement = "https://dev.azure.com/newserver/"
+                }
+            };
+            var x = GetStringManipulatorTool(options);
+
+            string? newValue = x.ProcessString("<a href=\"http://oldserver/tfs/_workitems\">link</a>");
+
+            Assert.AreEqual("<a href=\"https://dev.azure.com/newserver/tfs/_workitems\">link</a>", newValue);
+        }
+
         private static StringManipulatorTool GetStringManipulatorTool(StringManipulatorToolOptions options)
         {
             var services = new ServiceCollection();

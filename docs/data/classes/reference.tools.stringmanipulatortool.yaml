@@ -61,7 +61,7 @@ configurationSamples:
       ]
     }
   sampleFor: MigrationTools.Tools.StringManipulatorToolOptions
-description: Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
+description: Used to process the text fields of a work item. This covers plain text fields as well as the rich text and history fields such as `System.Description` and `System.History`. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
 className: StringManipulatorTool
 typeName: Tools
 options:
@@ -73,7 +73,7 @@ options:
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Manipulators
   type: List
-  description: List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
+  description: List of regex based string manipulations to apply to all text fields, including rich text fields such as `System.Description` and `System.History`. Each regex replacement is applied in order and can be enabled or disabled.
   defaultValue: '{}'
   isRequired: false
   dotNetType: System.Collections.Generic.List`1[[MigrationTools.Tools.RegexStringManipulator, MigrationTools, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
