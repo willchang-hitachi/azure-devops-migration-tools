@@ -16,9 +16,16 @@ Install-Module Microsoft.Graph.Authentication -Scope CurrentUser
 
 The script works with Windows PowerShell 5.1 or PowerShell 7+.
 
-If the script is blocked because it was downloaded, run `Unblock-File .\Sync-SharePoint.ps1`, or run it with `powershell -ExecutionPolicy Bypass -File .\Sync-SharePoint.ps1`.
+## Easiest way: double-click
 
-## Usage
+- **`Sync-SharePoint-DryRun.bat`** shows the differences and downloads nothing.
+- **`Sync-SharePoint.bat`** downloads new and updated files.
+
+Both run the script with `-ExecutionPolicy Bypass`, which applies to that run only. They change no system setting and need no admin rights. You can also pass arguments from cmd, for example `Sync-SharePoint.bat -RemoteFolder "Design"`.
+
+If your company enforces the execution policy through Group Policy, Windows ignores `Bypass`, and IT has to allow the script.
+
+## Usage from PowerShell
 
 ```powershell
 # 1. See what is different (downloads nothing)
